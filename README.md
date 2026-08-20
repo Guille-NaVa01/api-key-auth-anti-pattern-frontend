@@ -4,7 +4,15 @@ A plain HTML/CSS/JavaScript page (no build step, no framework) that consumes
 the companion [Backend API](../backend-api) and demonstrates sending a
 static `x-api-key` header from the browser.
 
-## Running it
+## Running it 
+
+First you need to run de backend, its in other repository, use the README.md of that repository to start the backend
+
+This is the backend repository link: 
+
+https://github.com/Guille-NaVa01/api-key-auth-anti-pattern-backend.git
+
+Then here open a terminal and follow the next instuctions:
 
 No dependencies to install. Just serve the folder statically, for example:
 
