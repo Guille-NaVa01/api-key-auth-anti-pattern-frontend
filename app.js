@@ -9,8 +9,9 @@
  */
 
 const baseUrlInput = document.getElementById("baseUrl");
-const apiKeyInput = document.getElementById("apiKey");
 const output = document.getElementById("output");
+
+const API_KEY = "supersecret-demo-key-123";
 
 function show(label, status, body) {
   output.textContent = `${label}\nStatus: ${status}\n\n${JSON.stringify(body, null, 2)}`;
@@ -21,7 +22,7 @@ async function callEndpoint(path, { method = "GET", withKey = false } = {}) {
   const headers = {};
 
   if (withKey) {
-    headers["x-api-key"] = apiKeyInput.value;
+    headers["x-api-key"] = API_KEY;
   }
   if (method === "POST") {
     headers["Content-Type"] = "application/json";
