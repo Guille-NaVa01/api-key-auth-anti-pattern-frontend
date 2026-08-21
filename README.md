@@ -1,60 +1,83 @@
-# Frontend App — `x-api-key` Anti-Pattern Exercise
+# Frontend App — `x-api-key` Anti-Pattern Exercise (Nginx Edition)
 
-A plain HTML/CSS/JavaScript page (no build step, no framework) that consumes
-the companion [Backend API](../backend-api) and demonstrates sending a
-static `x-api-key` header from the browser.
+A plain HTML/CSS/JavaScript page served by **Nginx inside Docker**, which acts as a
+reverse proxy to the companion [Backend API](https://github.com/Guille-NaVa01/api-key-auth-anti-pattern-backend).
 
-## Running it 
+## Architecture
 
-First you need to run de backend, its in other repository, use the README.md of that repository to start the backend
-
-This is the backend repository link: 
-
-https://github.com/Guille-NaVa01/api-key-auth-anti-pattern-backend.git
-
-Then here open a terminal and follow the next instuctions:
-
-No dependencies to install. Just serve the folder statically, for example:
-
-```bash
-python -m http.server 5500
+```
+Browser ──► Nginx :80 ──► inject x-api-key (server-side) ──► Backend :8000
+                └── serves static files (HTML / CSS / JS)
 ```
 
-Then open `http://127.0.0.1:5500` in your browser.
+The API key **never appears in browser-side code**. It lives in a `.env` file on your
+machine and is injected by Nginx into each proxied request — invisible in DevTools,
+the page source, and network traffic.
 
-Alternatively, just double-click `index.html` to open it directly (some
-browsers restrict `fetch` on `file://` pages, so a local server is
-recommended).
+## Running it
 
-Make sure the backend is running first (see `../backend-api/README.md`),
-and that the **Backend base URL** and **API key** fields on the page match
-your backend's address and configured key.
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+- The backend running locally on port **8000**
+  (see the [backend repo](https://github.com/Guille-NaVa01/api-key-auth-anti-pattern-backend))
+
+### Steps
+
+1. **Create your `.env` file** (gitignored — never committed):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Open `.env` and set the real key:
+
+   ```
+   API_KEY=supersecret-demo-key-123
+   ```
+
+2. **Open docker:**
+
+3. **Start the container:**
+
+   ```bash
+   docker compose up --build
+   ```
+
+4. **Open the app:**  <http://localhost>
+
+To stop: `docker compose down`
 
 ## Files
 
-- `index.html` — page structure: title, the two buttons, and the response area.
-- `styles.css` — all styling, kept out of the HTML.
-- `app.js` — uses `fetch()` to call the backend and attaches the `x-api-key`
-  header on every protected request.
+| File | Purpose |
+|------|---------|
+| `index.html` | Page structure: title, buttons, response area |
+| `styles.css` | All styling |
+| `app.js` | `fetch()` calls to Nginx — **no API key** |
+| `Dockerfile` | Builds the `nginx:alpine` image |
+| `compose.yml` | Docker Compose service definition |
+| `nginx/nginx.conf` | Static serving + `/api/` reverse proxy with key injection |
+| `nginx/entrypoint.sh` | Substitutes `$API_KEY` into nginx.conf at startup |
+| `.env.example` | Template for the required environment variable |
+| `.gitignore` | Ensures `.env` is never committed |
 
 ## What to look at
 
-1. Open your browser's DevTools → **Network** tab before clicking any
-   button.
-2. Click **Get Protected Data** or **Send POST Request** — inspect the
-   outgoing request and note the `x-api-key` header is sent in plain text,
-   visible to anyone who can see the request (browser, proxy, extension,
-   etc.).
-3. Try changing the key in the input field to something wrong and click a
-   button again to see the `401 Unauthorized` response rendered in the
-   Response box.
+1. Open **DevTools → Sources** and read `app.js` — no API key anywhere.
+2. Open **DevTools → Network**, click **Get Protected Data** or **Send POST Request**.
+3. Inspect the outgoing request to `/api/data` — the `x-api-key` header is **absent**
+   from the browser's view of the request (Nginx adds it after it leaves the browser).
+4. The response box still shows the protected data (200 OK), proving the key reached
+   the backend — just not through the browser.
 
 ## Note on repository structure
 
-This frontend is meant to live in its **own** GitHub repository, separate
-from the backend API repository — they are two independent projects that
-only communicate over HTTP.
+This frontend lives in its own GitHub repository, separate from the backend.
+The two projects communicate only over HTTP — the frontend never needs the raw key.
 
-This is the core lesson of the exercise: a secret that has to be known by
-client-side code cannot really stay secret. See the backend's README for a
-fuller discussion of why this pattern is weak and what to use instead.
+This is the improved pattern: move secrets to the server side. Even so, note that
+Nginx-injected headers can still be read by anyone with access to the Nginx config or
+the `.env` file — proper secret management (e.g. Docker Secrets, a Vault) is the
+next layer of defence.
+

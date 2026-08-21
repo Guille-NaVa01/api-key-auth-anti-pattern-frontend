@@ -1,29 +1,26 @@
 /**
  * Frontend logic for the Security Exercise demo.
  *
- * NOTE: The API key here is read straight from a text input and sent as a
- * plain `x-api-key` header on every protected request. Anyone with access
- * to this browser tab (dev tools, an extension, a proxy) can read it.
- * That is the point of the exercise: a key that lives in client-side code
- * or is typed into a client-side form cannot be kept secret.
+ * The API key is NO LONGER present here. It lives in the server-side .env
+ * file and is injected by Nginx as an `x-api-key` header before each request
+ * is forwarded to the backend. The browser never sees or sends the key —
+ * it is invisible in DevTools, the page source, and network traffic.
+ *
+ * Architecture:
+ *   Browser → Nginx (port 80) → inject x-api-key → Backend (port 8000)
  */
 
 const baseUrlInput = document.getElementById("baseUrl");
 const output = document.getElementById("output");
 
-const API_KEY = "supersecret-demo-key-123";
-
 function show(label, status, body) {
   output.textContent = `${label}\nStatus: ${status}\n\n${JSON.stringify(body, null, 2)}`;
 }
 
-async function callEndpoint(path, { method = "GET", withKey = false } = {}) {
+async function callEndpoint(path, { method = "GET" } = {}) {
   const baseUrl = baseUrlInput.value.replace(/\/$/, "");
   const headers = {};
 
-  if (withKey) {
-    headers["x-api-key"] = API_KEY;
-  }
   if (method === "POST") {
     headers["Content-Type"] = "application/json";
   }
@@ -49,9 +46,9 @@ async function callEndpoint(path, { method = "GET", withKey = false } = {}) {
 }
 
 document.getElementById("btnGetData").addEventListener("click", () => {
-  callEndpoint("/api/data", { method: "GET", withKey: true });
+  callEndpoint("/api/data", { method: "GET" });
 });
 
 document.getElementById("btnPostData").addEventListener("click", () => {
-  callEndpoint("/api/data", { method: "POST", withKey: true });
+  callEndpoint("/api/data", { method: "POST" });
 });

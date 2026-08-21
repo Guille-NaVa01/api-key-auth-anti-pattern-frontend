@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    env_file:
+      - .env                      # contains API_KEY=your-secret-here (gitignored)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # allows Nginx to reach localhost:8000
+    restart: unless-stopped
