@@ -28,10 +28,7 @@ machine, is read by Docker Compose, and is injected into each proxied request by
 
 **1. Clone this repo** (if you haven't already):
 
-```bash
-git clone https://github.com/Guille-NaVa01/api-key-auth-anti-pattern-frontend.git
-cd api-key-auth-anti-pattern-frontend
-```
+
 
 **2. Create the `.env` file** with the API key (this file is gitignored — it never gets committed):
 
