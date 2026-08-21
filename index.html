@@ -1,38 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Security Exercise — Frontend</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <main class="container">
-    <h1>Security API Exercise</h1>
-    <p class="subtitle">
-      This app calls the backend's protected endpoints and demonstrates sending a
-      static <code>x-api-key</code> header from client-side JavaScript.
-    </p>
-
-    <section class="card">
-      <h2>Configuration</h2>
-      <label for="baseUrl">Backend base URL</label>
-      <input id="baseUrl" type="text" value="http://localhost" />
-    </section>
-
-    <section class="card">
-      <div class="buttons">
-        <button id="btnGetData">Get Protected Data</button>
-        <button id="btnPostData">Send POST Request</button>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>Response:</h2>
-      <pre id="output">Click a button above to make a request…</pre>
-    </section>
-  </main>
-
-  <script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cybersecurity exercise demonstrating the API key anti-pattern and how Nginx solves it as a server-side reverse proxy." />
+    <title>SecureProxy — API Key Auth Exercise</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
